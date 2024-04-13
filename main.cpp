@@ -32,7 +32,7 @@ while (1)
 {
     hal_gpio_put(LED_GPIO, 0);
 
-  char payload[] = "Om namo venkateshayaa";
+  char payload[] = "Namaste Bro";
   lora->SendData(22, payload, strlen(payload));
       sleep_ms(1000);
       lora->ProcessIrq();
