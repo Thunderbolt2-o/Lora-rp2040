@@ -1,4 +1,4 @@
-add_executable(code main.cpp bme68x/bme68x.c sx126x/sx126x.c sx126x/sx126x_hal.c sx126x/lora.cpp)
+add_executable(code main.cpp bme68x/bme68x_hal.cpp bme68x/bme68x.c sx126x/sx126x.c sx126x/sx126x_hal.c sx126x/lora.cpp)
 
 target_link_libraries(code pico_stdlib hardware_i2c hardware_spi)
 
