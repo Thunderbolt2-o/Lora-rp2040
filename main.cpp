@@ -5,8 +5,10 @@
 #define SDA_PIN 12
 #define packet "The BME680 data Temperature %.2f : Pressure %.2f : Humidity %.2f : Gas resistance %.2f"
 
+// BME680 address
 #define LED_GPIO 25
 
+using namespace pico_ssd1306;
 Lora *lora;
 
 int main(){
@@ -18,6 +20,16 @@ int main(){
     gpio_set_function(SCL_PIN, GPIO_FUNC_I2C);
     gpio_pull_up(SDA_PIN);
     gpio_pull_up(SCL_PIN);
+
+    // Create a new display object at address 0x3C and size of 128x32
+    SSD1306 display = SSD1306(i2c0, 0x3C, Size::W128xH32);
+
+    display.setOrientation(0);
+    // Draw text on display 1
+    drawText(&display, font_16x32, "Connect :)", 0, 0);
+    sleep_ms(1000);
+    display.sendBuffer();
+    display.clear();
 
     struct bme68x_dev bme;
     bme.intf = BME68X_I2C_INTF;
@@ -55,11 +67,10 @@ int main(){
         rslt = bme68x_set_heatr_conf(BME68X_FORCED_MODE, &heatr_conf, &bme);
         bme68x_check_rslt("bme68x_set_heatr_conf", rslt);
 
-  sleep_ms(2000);
+  sleep_ms(500);
   gpio_init(LED_GPIO);
   gpio_set_dir(LED_GPIO, 1);
   gpio_put(LED_GPIO, 1);
-  sleep_ms(2000);
   printf("[Main] Setting up Lora Chip");
   
   lora = new Lora();
@@ -67,7 +78,7 @@ int main(){
   printf("[Main] Done");
 while (1)
 {
-    hal_gpio_put(LED_GPIO, 0);
+   hal_gpio_put(LED_GPIO, 0);
 
    rslt = bme68x_set_op_mode(BME68X_FORCED_MODE, &bme);
             bme68x_check_rslt("bme68x_set_op_mode", rslt);
@@ -82,6 +93,10 @@ while (1)
             rslt = bme68x_get_data(BME68X_FORCED_MODE, &data, &n_fields, &bme);
             bme68x_check_rslt("bme68x_get_data", rslt);
 
+            char temperature[6];
+            sprintf(temperature, "x = %.3f", data.temperature);
+            drawText(&display, font_8x8, temperature, 0, 0);
+            display.sendBuffer();
   char payload[100];
   sprintf(payload, packet, data.temperature, data.pressure, data.humidity, data.gas_resistance);
   lora->SendData(22, payload, strlen(payload));
@@ -91,8 +106,8 @@ while (1)
 
   hal_gpio_put(LED_GPIO, 1);
   sleep_ms(2000);
+  display.clear();
 }
 
     return 0;
 }
-

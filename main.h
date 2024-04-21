@@ -12,6 +12,8 @@
 #include "bme68x/bme68x_defs.h"
 #include "bme68x/bme68x_hal.h"
 #include "hardware/i2c.h"
+#include "pico-ssd1306/ssd1306.h"
+#include "pico-ssd1306/textRenderer/TextRenderer.h"
 #include "pico/time.h"
 #include "pico/binary_info.h"
 
